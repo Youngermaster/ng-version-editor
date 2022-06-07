@@ -7,7 +7,7 @@ fmt:
 	gofmt main.go
 
 build:
-	go build -o build/ng-version-eraser main.go
+	go build -o bin/ng-version-eraser main.go
 
 clean:
-	rm -rf build/
+	rm -rf bin/
