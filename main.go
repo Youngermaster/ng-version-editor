@@ -9,8 +9,10 @@ import (
 )
 
 func main() {
+	stringToDelete := "ng-version=\""
 
-	file, err := os.Open("sample.txt")
+	file, err := os.OpenFile("sample.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -19,7 +21,17 @@ func main() {
 	Scanner.Split(bufio.ScanWords)
 
 	for Scanner.Scan() {
-		if strings.Contains(Scanner.Text(), "ng-version=") {
+		if strings.Contains(Scanner.Text(), stringToDelete) {
+			items := strings.Split(Scanner.Text(), " ")
+			fmt.Println(items)
+			for _, item := range items {
+				fmt.Println(item)
+				if strings.Contains(item, stringToDelete) {
+					item = ">"
+					fmt.Println(item)
+					file.WriteString(item);
+				}
+			}
 			fmt.Println("Gotcha")
 			break
 		}
@@ -30,4 +42,6 @@ func main() {
 	if err := Scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
+
+	file.Close()
 }

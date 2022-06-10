@@ -1,6 +1,6 @@
 stuff
 stuff
 stuff
-ng-version="1.0.0"
+stuff ng-version="1.0.0" stuff
 stuff
 stuff
