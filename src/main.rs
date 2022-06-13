@@ -3,6 +3,9 @@ use regex::Regex;
 use std::env;
 use std::process;
 
+use std::io::{BufRead, BufReader};
+use std::{fs, fs::OpenOptions};
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
@@ -18,6 +21,26 @@ fn main() {
     }
     edit_version();
     remove_tag();
+    skip_test();
+}
+
+fn skip_test() {
+    println!("Skip TEST");
+    let file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open("file.txt")
+        .expect("file.txt doesn't exist or so");
+
+    let mut lines = BufReader::new(file)
+        .lines()
+        .map(|x| x.unwrap())
+        .collect::<Vec<String>>()
+        .join("\n");
+
+    lines.remove(1);
+
+    fs::write("file.txt", lines).expect("Can't write");
 }
 
 fn edit_version() {
