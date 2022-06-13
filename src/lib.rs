@@ -1,6 +1,7 @@
 use std::env;
 use std::error::Error;
 use std::fs;
+use std::io::Write;
 
 pub struct Config {
     pub query: String,
@@ -11,7 +12,7 @@ pub struct Config {
 impl Config {
     pub fn build(args: &[String]) -> Result<Config, &'static str> {
         if args.len() < 3 {
-            return Err("not enough arguments");
+            return Err("Not enough arguments");
         }
 
         let query = args[1].clone();
@@ -28,7 +29,13 @@ impl Config {
 }
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
-    let contents = fs::read_to_string(config.file_path)?;
+    let mut file = fs::OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(&config.file_path)
+        .unwrap();
+    file.write_all(b"\nbuf").unwrap();
+    let contents = fs::read_to_string(&config.file_path)?;
 
     let results = if config.ignore_case {
         search_case_insensitive(&config.query, &contents)
@@ -46,8 +53,9 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
     let mut results = Vec::new();
 
-    for line in contents.lines() {
+    for (i, line) in contents.lines().enumerate() {
         if line.contains(query) {
+            println!("Got it in line: {}", &i);
             results.push(line);
         }
     }
@@ -59,8 +67,9 @@ pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a st
     let query = query.to_lowercase();
     let mut results = Vec::new();
 
-    for line in contents.lines() {
+    for (i, line) in contents.lines().enumerate() {
         if line.to_lowercase().contains(&query) {
+            println!("Got it in line: {}", &i);
             results.push(line);
         }
     }
